@@ -3,8 +3,8 @@ Class {
 	#superclass : #SpPresenter,
 	#instVars : [
 		'recommendations',
-		'methodsList',
-		'methodPresenter'
+		'recommendationsList',
+		'recommendationPresenter'
 	],
 	#category : #ConsultingDetective
 }
@@ -18,8 +18,8 @@ Sherlock class >> defaultExtent [
 Sherlock class >> defaultSpec [
 	^ SpBoxLayout newHorizontal
 		spacing: 5;
-		add: #methodsList;
-		add: #methodPresenter;
+		add: #recommendationsList;
+		add: #recommendationPresenter;
 		yourself.
 ]
 
@@ -58,25 +58,25 @@ Sherlock >> buildToolbar [
 Sherlock >> connectPresenters [
 	super connectPresenters.
 	
-	methodsList whenSelectionChangedDo: [ 
-		self displayMethod: methodsList selectedItem ].
+	recommendationsList whenSelectionChangedDo: [ 
+		self displayRecommendation: recommendationsList selectedItem ].
 ]
 
 { #category : #'as yet unclassified' }
-Sherlock >> displayMethod: aMethod [
+Sherlock >> displayRecommendation: aRecommendation [
 
-	methodPresenter method: aMethod
+	recommendationPresenter recommendation: aRecommendation
 ]
 
 { #category : #initialization }
 Sherlock >> initializePresenters [
 	super initializePresenters.
 	
-	methodsList := self newList
+	recommendationsList := self newList
 		display: [ :recommendation | recommendation method ];
 		yourself.
 		
-	methodPresenter := self instantiate: SherlockMethodPresenter.
+	recommendationPresenter := self instantiate: SherlockMethodRecommendationPresenter.
 	
 	recommendations ifNotNil: [
 		self showMethods ]
@@ -101,7 +101,7 @@ Sherlock >> setModelBeforeInitialization: aCollectionOfRecommendations [
 { #category : #'as yet unclassified' }
 Sherlock >> showMethods [
 
-	methodsList items: recommendations
+	recommendationsList items: recommendations
 ]
 
 { #category : #building }

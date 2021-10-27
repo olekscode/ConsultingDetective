@@ -1,12 +1,11 @@
 Class {
-	#name : #SherlockMethodPresenter,
-	#superclass : #SpPresenter,
+	#name : #SherlockMethodRecommendationPresenter,
+	#superclass : #SherlockRecommendationPresenter,
 	#instVars : [
-		'recommendation',
+		'missingMethodLabel',
+		'commitTable',
 		'isPublicRadioYes',
 		'isPublicRadioNo',
-		'missingMethodLabel',
-		'commitLabel',
 		'replacementsList',
 		'submitButton'
 	],
@@ -14,13 +13,13 @@ Class {
 }
 
 { #category : #specs }
-SherlockMethodPresenter class >> defaultSpec [
+SherlockMethodRecommendationPresenter class >> defaultSpec [
 
 	^ SpBoxLayout newVertical
 		spacing: 3;
 		add: (SpBoxLayout newVertical
 			add: #missingMethodLabel height: self labelHeight;
-			add: #commitLabel height: self labelHeight;
+			add: #commitTable;
 			yourself);
 		add: (SpBoxLayout newVertical
 			add: #isPublicRadioYes height: self labelHeight;
@@ -39,25 +38,13 @@ SherlockMethodPresenter class >> defaultSpec [
 ]
 
 { #category : #'as yet unclassified' }
-SherlockMethodPresenter >> displayCommitLabel [
-	| commit text |
-	commit := recommendation blamedCommit.
-	
-	text := String streamContents: [ :stream |
-		stream
-			nextPutAll: 'It war removed in on ';
-			nextPutAll: commit datetime asDate asString;
-			nextPutAll: ' by ';
-			nextPutAll: commit author;
-			nextPutAll: ' in commit ';
-			nextPutAll: commit shortId;
-			nextPut: $. ].
+SherlockMethodRecommendationPresenter >> displayCommitTable [
 
-	commitLabel label: text.
+	commitTable commit: recommendation blamedCommit
 ]
 
 { #category : #'as yet unclassified' }
-SherlockMethodPresenter >> displayMissingMethodLabel [
+SherlockMethodRecommendationPresenter >> displayMissingMethodLabel [
 	| text |
 	
 	text := String streamContents: [ :stream |
@@ -70,27 +57,27 @@ SherlockMethodPresenter >> displayMissingMethodLabel [
 ]
 
 { #category : #'as yet unclassified' }
-SherlockMethodPresenter >> displayRecommendation [
+SherlockMethodRecommendationPresenter >> displayRecommendation [
 
 	self displayMissingMethodLabel.
-	self displayCommitLabel.
+	self displayCommitTable.
 	self displayReplacementsList.
 	
 ]
 
 { #category : #'as yet unclassified' }
-SherlockMethodPresenter >> displayReplacementsList [
+SherlockMethodRecommendationPresenter >> displayReplacementsList [
 	
 	replacementsList items: recommendation replacements
 ]
 
 { #category : #initialization }
-SherlockMethodPresenter >> initializePresenters [
+SherlockMethodRecommendationPresenter >> initializePresenters [
 
 	super initializePresenters.
 	
 	missingMethodLabel := self newLabel.
-	commitLabel := self newLabel.
+	commitTable := self instantiate: CommitTablePresenter.
 	
 	isPublicRadioYes := self newRadioButton
 		label: 'Yes, this method is part of the API and can be used by clients';
@@ -110,19 +97,4 @@ SherlockMethodPresenter >> initializePresenters [
 	
 	recommendation ifNotNil: [ 
 		self displayRecommendation ].
-]
-
-{ #category : #accessing }
-SherlockMethodPresenter >> method: aMethod [
-
-	recommendation := aMethod.
-	
-	recommendation ifNotNil: [ 
-		self displayRecommendation ].
-]
-
-{ #category : #initialization }
-SherlockMethodPresenter >> setModelBeforeInitialization: aRecommendation [
-
-	recommendation := aRecommendation
 ]
