@@ -3,8 +3,7 @@ Class {
 	#superclass : #SpPresenter,
 	#instVars : [
 		'recommendations',
-		'recommendationsList',
-		'recommendationPresenter'
+		'notebook'
 	],
 	#category : #ConsultingDetective
 }
@@ -18,8 +17,7 @@ Sherlock class >> defaultExtent [
 Sherlock class >> defaultSpec [
 	^ SpBoxLayout newHorizontal
 		spacing: 5;
-		add: #recommendationsList;
-		add: #recommendationPresenter;
+		add: #notebook;
 		yourself.
 ]
 
@@ -58,28 +56,34 @@ Sherlock >> buildToolbar [
 Sherlock >> connectPresenters [
 	super connectPresenters.
 	
-	recommendationsList whenSelectionChangedDo: [ 
-		self displayRecommendation: recommendationsList selectedItem ].
-]
-
-{ #category : #'as yet unclassified' }
-Sherlock >> displayRecommendation: aRecommendation [
-
-	recommendationPresenter recommendation: aRecommendation
+	
 ]
 
 { #category : #initialization }
 Sherlock >> initializePresenters [
+	| classesPage methodsPage |
 	super initializePresenters.
 	
-	recommendationsList := self newList
-		display: [ :recommendation | recommendation method ];
-		yourself.
-		
-	recommendationPresenter := self instantiate: SherlockMethodRecommendationPresenter.
+	classesPage := self instantiate: SherlockClassPagePresenter. 
+	methodsPage := self instantiate: SherlockMethodsPagePresenter.
 	
-	recommendations ifNotNil: [
-		self showMethods ]
+	classesPage recommendations: recommendations.
+	methodsPage recommendations: recommendations.
+	
+	notebook := self newNotebook
+		addPage: (self newNotebookPage
+			title: 'Step 1: Missing classes';
+			presenterProvider: [ classesPage ];
+			yourself);
+		addPage: (self newNotebookPage
+			title: 'Step 2: Missing methods with replacements';
+			presenterProvider: [ methodsPage ];
+			yourself);
+		addPage: (self newNotebookPage
+			title: 'Step 3: Missing methods without replacements';
+			presenterProvider: [ methodsPage ];
+			yourself);
+		yourself.
 ]
 
 { #category : #initialization }
@@ -96,12 +100,6 @@ Sherlock >> initializeWindow: aWindowPresenter [
 Sherlock >> setModelBeforeInitialization: aCollectionOfRecommendations [
 
 	recommendations := aCollectionOfRecommendations
-]
-
-{ #category : #'as yet unclassified' }
-Sherlock >> showMethods [
-
-	recommendationsList items: recommendations
 ]
 
 { #category : #building }
